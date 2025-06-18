@@ -261,7 +261,9 @@ public class AndroidTenjin : BaseTenjin
 			string campaignId = data.Call<string>("get", "campaign_id");
 			string campaignName = data.Call<string>("get", "campaign_name");
 			string siteId = data.Call<string>("get", "site_id");
+			string clickId = data.Call<string>("get", "click_id");
 			string creativeName = data.Call<string>("get", "creative_name");
+			string remoteCampaignId = data.Call<string>("get", "remote_campaign_id");
 
 			if (!string.IsNullOrEmpty(adNetwork)) {
 				attributionInfoData["ad_network"] = adNetwork;
@@ -278,8 +280,14 @@ public class AndroidTenjin : BaseTenjin
 			if (!string.IsNullOrEmpty(siteId)) {
 				attributionInfoData["site_id"] = siteId;
 			}
+			if (!string.IsNullOrEmpty(clickId)) {
+				attributionInfoData["click_id"] = clickId;
+			}
 			if (!string.IsNullOrEmpty(creativeName)) {
 				attributionInfoData["creative_name"] = creativeName;
+			}
+			if (!string.IsNullOrEmpty(remoteCampaignId)) {
+				attributionInfoData["remote_campaign_id"] = remoteCampaignId;
 			}
 
 			callback(attributionInfoData);
@@ -599,6 +607,21 @@ public class AndroidTenjin : BaseTenjin
 		}
 	}
 
+	public override void SetEncryptRequestsSetting(bool setting) {
+		Debug.Log($"SetEncryptRequestsSetting {setting}");
+		try {
+			using (AndroidJavaClass booleanClass = new AndroidJavaClass("java.lang.Boolean")) {
+				using (AndroidJavaObject javaBoolean = booleanClass.CallStatic<AndroidJavaObject>("valueOf", setting)) {
+					bool javaPrimitiveBoolean = javaBoolean.Call<bool>("booleanValue");
+					var args = new object[] { javaPrimitiveBoolean };
+					tenjinJava.Call("setEncryptRequestsSetting", args);
+				}
+			}
+		} catch (Exception e) {
+			Debug.LogError("Error in SetEncryptRequestsSetting: " + e.Message);
+		}
+	}
+
 	public override string GetAnalyticsInstallationId() {
 		Debug.Log($"GetAnalyticsInstallationId");
 		return tenjinJava.Call<string> ("getAnalyticsInstallationId");
@@ -873,6 +896,11 @@ public class AndroidTenjin : BaseTenjin
     public override void SetCacheEventSetting(bool setting)
     {
         Debug.Log("Setting AndroidTenjin::SetCacheEventSetting: " + setting);
+    }
+
+	public override void SetEncryptRequestsSetting(bool setting)
+    {
+        Debug.Log("Setting AndroidTenjin::SetEncryptRequestsSetting: " + setting);
     }
 
 	public override string GetAnalyticsInstallationId()

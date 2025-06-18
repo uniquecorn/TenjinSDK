@@ -339,6 +339,10 @@ void iosTenjinSetCacheEventSetting(bool setting) {
     [TenjinSDK setCacheEventSetting:setting];
 }
 
+void iosTenjinSetEncryptRequestsSetting(bool setting) {
+    [TenjinSDK setEncryptRequestsSetting:setting];
+}
+
 void iosTenjinSetGoogleDMAParameters(bool adPersonalization, bool adUserData) {
     [[TenjinSDK sharedInstance] setGoogleDMAParametersWithAdPersonalization:adPersonalization adUserData:adUserData];
 }

@@ -1,6 +1,6 @@
 //
 // Created by Tenjin on 2016-05-20.
-//  Version 1.14.2
+//  Version 1.14.9
 
 //  Copyright (c) 2016 Tenjin. All rights reserved.
 //
@@ -91,9 +91,13 @@ andDeferredDeeplink:(NSURL *)url
 //use sendEventWithName for custom event names
 + (void)sendEventWithName:(NSString *)eventName;
 
-//This method checks to make sure integers are passed as values.
+//This method is deprecated in favor of [sendEventWithName: andValue:], so you can pass an integer directly
 + (void)sendEventWithName:(NSString *)eventName
-            andEventValue:(NSString *)eventValue;
+            andEventValue:(NSString *)eventValue __deprecated_msg("use `sendEventWithName: andValue:` instead");
+
+//Use this method to send custom events with values
++ (void)sendEventWithName:(NSString *)eventName
+            andValue:(NSInteger)eventValue;
 
 //This method is deprecated in favor of [transaction: andReceipt:], so Tenjin can verify your transactions
 + (void)transaction:(SKPaymentTransaction *)transaction __attribute__((deprecated));
@@ -181,6 +185,9 @@ andDeferredDeeplink:(NSURL *)url
 // Set the setting to enable/disable cache events and retrying, it's false by default
 + (void)setCacheEventSetting:(BOOL)isCacheEventsEnabled;
 
+// Set the setting to enable/disable ecrypting requests, it's false by default
++ (void)setEncryptRequestsSetting:(BOOL)isEncryptRequestsEnabled;
+
 // Get cached analytics_installation_id
 + (NSString*)getAnalyticsInstallationId;
 
@@ -209,6 +216,7 @@ andDeferredDeeplink:(NSURL *)url
 - (void)setGoogleDMAParametersWithAdPersonalization:(BOOL)adPersonalization adUserData:(BOOL)adUserData;
 
 @end
+
 
 //
 // Created by Tenjin

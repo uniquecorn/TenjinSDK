@@ -70,6 +70,7 @@ void iosTenjinTradPlusImpressionFromJSON(const char* jsonString);
 void iosTenjinSetCustomerUserId(const char* userId);
 const char* iosTenjinGetSetCustomerUserId();
 void iosTenjinSetCacheEventSetting(bool setting);
+void iosTenjinSetEncryptRequestsSetting(bool setting);
 const char* iosTenjinGetAnalyticsInstallationId();
 }
 

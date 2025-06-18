@@ -289,6 +289,11 @@ public class DebugTenjin : BaseTenjin
         Debug.Log("SetCacheEventSetting");
     }
 
+    public override void SetEncryptRequestsSetting(bool setting)
+    {
+        Debug.Log("SetEncryptRequestsSetting");
+    }
+
     public override void SetGoogleDMAParameters(bool adPersonalization, bool adUserData)
     {
         Debug.Log("SetGoogleDMAParameters");

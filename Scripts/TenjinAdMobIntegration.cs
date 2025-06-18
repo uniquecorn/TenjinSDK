@@ -8,188 +8,103 @@ using UnityEngine;
 
 public class TenjinAdMobIntegration
 {
-    // TODO: Potential issue with multiple ad types being subscribed to at once TENJIN-16020
-    private static bool _subscribed_admob = false;
-    public TenjinAdMobIntegration()
-    {
-    }
+    private static bool _subscribed_banner = false;
+    private static bool _subscribed_rewarded = false;
+    private static bool _subscribed_interstitial = false;
+    private static bool _subscribed_rewarded_interstitial = false;
+
+    public TenjinAdMobIntegration() { }
+
     public static void ListenForBannerViewImpressions(object bannerView, string adUnitId, Action<string> callback)
     {
 #if tenjin_admob_enabled
-        if (_subscribed_admob)
+        GoogleMobileAds.Api.BannerView newBannerView = (GoogleMobileAds.Api.BannerView)bannerView;
+        SubscribeToAd(newBannerView, adUnitId, callback, ref _subscribed_banner, (ad, args) =>
         {
-            Debug.Log("Ignoring duplicate admob bannerView subscription");
-            return;
-        }
-        GoogleMobileAds.Api.BannerView newBannerView = (GoogleMobileAds.Api.BannerView) bannerView;        
-        newBannerView.OnAdPaid += (args) =>
-        {
-            GoogleMobileAds.Api.ResponseInfo responseInfo = newBannerView.GetResponseInfo();
-            if (responseInfo != null)
-            {
-                String adResponseId = responseInfo.GetResponseId();
-                try
-                {
-                    AdMobImpressionDataToJSON adMobImpressionDataToJSON = new AdMobImpressionDataToJSON()
-                    {
-                        ad_unit_id = adUnitId,
-                        #if UNITY_ANDROID
-                            value_micros = args.Value,
-                        #elif UNITY_IPHONE
-                            value_micros = (args.Value / 1000000.0),
-                        #else
-                            value_micros = args.Value,
-                        #endif
-                        currency_code = args.CurrencyCode,
-                        response_id = adResponseId,
-                        precision_type = args.Precision.ToString(),
-                        mediation_adapter_class_name = responseInfo.GetMediationAdapterClassName()
-                    };
-                    string json = JsonUtility.ToJson(adMobImpressionDataToJSON);
-                    callback(json);
-                }
-                catch (Exception ex)
-                {
-                    Debug.Log($"error parsing bannerView impression " + ex.ToString());
-                }
-            }
-        };
-        _subscribed_admob = true;
+            newBannerView.OnAdPaid += (adValue) => HandleAdPaid(newBannerView.GetResponseInfo(), adValue, adUnitId, callback);
+        });
 #endif
     }
+
     public static void ListenForRewardedAdImpressions(object rewardedAd, string adUnitId, Action<string> callback)
     {
 #if tenjin_admob_enabled
-        if (_subscribed_admob)
+        GoogleMobileAds.Api.RewardedAd newRewardedAd = (GoogleMobileAds.Api.RewardedAd)rewardedAd;
+        SubscribeToAd(newRewardedAd, adUnitId, callback, ref _subscribed_rewarded, (ad, args) =>
         {
-            Debug.Log("Ignoring duplicate admob rewardedAd subscription");
-            return;
-        }
-        GoogleMobileAds.Api.RewardedAd newRewardedAd = (GoogleMobileAds.Api.RewardedAd) rewardedAd;
-        newRewardedAd.OnAdPaid += (args) =>
-        {
-            GoogleMobileAds.Api.ResponseInfo responseInfo = newRewardedAd.GetResponseInfo();
-            if (responseInfo != null)
-            {
-                String adResponseId = responseInfo.GetResponseId();
-                try
-                {
-                    AdMobImpressionDataToJSON adMobImpressionDataToJSON = new AdMobImpressionDataToJSON()
-                    {
-                        ad_unit_id = adUnitId,
-                        #if UNITY_ANDROID
-                            value_micros = args.Value,
-                        #elif UNITY_IPHONE
-                            value_micros = (args.Value / 1000000.0),
-                        #else
-                            value_micros = args.Value,
-                        #endif
-                        currency_code = args.CurrencyCode,
-                        response_id = adResponseId,
-                        precision_type = args.Precision.ToString(),
-                        mediation_adapter_class_name = responseInfo.GetMediationAdapterClassName()
-                    };
-                    string json = JsonUtility.ToJson(adMobImpressionDataToJSON);
-                    callback(json);
-                }
-                catch (Exception ex)
-                {
-                    Debug.Log($"error parsing rewardedAd impression " + ex.ToString());
-                }
-            }
-        };
-        _subscribed_admob = true;
+            newRewardedAd.OnAdPaid += (adValue) => HandleAdPaid(newRewardedAd.GetResponseInfo(), adValue, adUnitId, callback);
+        });
 #endif
     }
+
     public static void ListenForInterstitialAdImpressions(object interstitialAd, string adUnitId, Action<string> callback)
     {
 #if tenjin_admob_enabled
-        if (_subscribed_admob)
+        GoogleMobileAds.Api.InterstitialAd newInterstitialAd = (GoogleMobileAds.Api.InterstitialAd)interstitialAd;
+        SubscribeToAd(newInterstitialAd, adUnitId, callback, ref _subscribed_interstitial, (ad, args) =>
         {
-            Debug.Log("Ignoring duplicate admob interstitialAd subscription");
-            return;
-        }
-        GoogleMobileAds.Api.InterstitialAd newInterstitialAd = (GoogleMobileAds.Api.InterstitialAd) interstitialAd;
-        newInterstitialAd.OnAdPaid += (args) =>
-        {
-            GoogleMobileAds.Api.ResponseInfo responseInfo = newInterstitialAd.GetResponseInfo();
-            if (responseInfo != null)
-            {
-                String adResponseId = responseInfo.GetResponseId();
-                try
-                {
-                    AdMobImpressionDataToJSON adMobImpressionDataToJSON = new AdMobImpressionDataToJSON()
-                    {
-                        ad_unit_id = adUnitId,
-                        #if UNITY_ANDROID
-                            value_micros = args.Value,
-                        #elif UNITY_IPHONE
-                            value_micros = (args.Value / 1000000.0),
-                        #else
-                            value_micros = args.Value,
-                        #endif
-                        currency_code = args.CurrencyCode,
-                        response_id = adResponseId,
-                        precision_type = args.Precision.ToString(),
-                        mediation_adapter_class_name = responseInfo.GetMediationAdapterClassName()
-                    };
-                    string json = JsonUtility.ToJson(adMobImpressionDataToJSON);
-                    callback(json);
-                }
-                catch (Exception ex)
-                {
-                    Debug.Log($"error parsing interstitialAd impression " + ex.ToString());
-                }
-            }
-        };
-        _subscribed_admob = true;
+            newInterstitialAd.OnAdPaid += (adValue) => HandleAdPaid(newInterstitialAd.GetResponseInfo(), adValue, adUnitId, callback);
+        });
 #endif
     }
 
     public static void ListenForRewardedInterstitialAdImpressions(object rewardedInterstitialAd, string adUnitId, Action<string> callback)
     {
 #if tenjin_admob_enabled
-        if (_subscribed_admob)
+        GoogleMobileAds.Api.RewardedInterstitialAd newRewardedInterstitialAd = (GoogleMobileAds.Api.RewardedInterstitialAd)rewardedInterstitialAd;
+        SubscribeToAd(newRewardedInterstitialAd, adUnitId, callback, ref _subscribed_rewarded_interstitial, (ad, args) =>
         {
-            Debug.Log("Ignoring duplicate admob rewardedInterstitialAd subscription");
-            return;
-        }
-        GoogleMobileAds.Api.RewardedInterstitialAd newRewardedInterstitialAd = (GoogleMobileAds.Api.RewardedInterstitialAd) rewardedInterstitialAd;
-        newRewardedInterstitialAd.OnAdPaid += (args) =>
-        {
-            GoogleMobileAds.Api.ResponseInfo responseInfo = newRewardedInterstitialAd.GetResponseInfo();
-            if (responseInfo != null)
-            {
-                String adResponseId = responseInfo.GetResponseId();
-                try
-                {
-                    AdMobImpressionDataToJSON adMobImpressionDataToJSON = new AdMobImpressionDataToJSON()
-                    {
-                        ad_unit_id = adUnitId,
-                        #if UNITY_ANDROID
-                            value_micros = args.Value,
-                        #elif UNITY_IPHONE
-                            value_micros = (args.Value / 1000000.0),
-                        #else
-                            value_micros = args.Value,
-                        #endif
-                        currency_code = args.CurrencyCode,
-                        response_id = adResponseId,
-                        precision_type = args.Precision.ToString(),
-                        mediation_adapter_class_name = responseInfo.GetMediationAdapterClassName()
-                    };
-                    string json = JsonUtility.ToJson(adMobImpressionDataToJSON);
-                    callback(json);
-                }
-                catch (Exception ex)
-                {
-                    Debug.Log($"error parsing rewardedInterstitialAd impression " + ex.ToString());
-                }
-            }
-        };
-        _subscribed_admob = true;
+            newRewardedInterstitialAd.OnAdPaid += (adValue) => HandleAdPaid(newRewardedInterstitialAd.GetResponseInfo(), adValue, adUnitId, callback);
+        });
 #endif
     }
+
+#if tenjin_admob_enabled
+    private static void SubscribeToAd<T>(T ad, string adUnitId, Action<string> callback, ref bool subscribedFlag, Action<T, GoogleMobileAds.Api.AdValue> adPaidHandler)
+    {
+        if (subscribedFlag)
+        {
+            Debug.Log($"Ignoring duplicate {typeof(T).Name} subscription");
+            return;
+        }
+
+        adPaidHandler(ad, null);
+
+        subscribedFlag = true;
+    }
+
+    private static void HandleAdPaid(GoogleMobileAds.Api.ResponseInfo responseInfo, GoogleMobileAds.Api.AdValue adValue, string adUnitId, Action<string> callback)
+    {
+        if (responseInfo != null && adValue != null)
+        {
+            String adResponseId = responseInfo.GetResponseId();
+            try
+            {
+                AdMobImpressionDataToJSON adMobImpressionDataToJSON = new AdMobImpressionDataToJSON()
+                {
+                    ad_unit_id = adUnitId,
+    #if UNITY_ANDROID
+                    value_micros = adValue.Value,
+    #elif UNITY_IPHONE
+                    value_micros = (adValue.Value / 1000000.0),
+    #else
+                    value_micros = adValue.Value,
+    #endif
+                    currency_code = adValue.CurrencyCode,
+                    response_id = adResponseId,
+                    precision_type = adValue.Precision.ToString(),
+                    mediation_adapter_class_name = responseInfo.GetMediationAdapterClassName()
+                };
+                string json = JsonUtility.ToJson(adMobImpressionDataToJSON);
+                callback(json);
+            }
+            catch (Exception ex)
+            {
+                Debug.Log($"Error parsing ad impression: {ex.ToString()}");
+            }
+        }
+    }
+#endif
 }
 
 [System.Serializable]

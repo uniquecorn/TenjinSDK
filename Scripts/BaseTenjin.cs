@@ -16,7 +16,7 @@ public abstract class BaseTenjin : MonoBehaviour
     protected bool optOut;
     protected int appSubversion;
 
-    public string SdkVersion { get; } = "1.15.6";
+    public string SdkVersion { get; } = "1.15.13";
 
     public string ApiKey
     {
@@ -105,6 +105,7 @@ public abstract class BaseTenjin : MonoBehaviour
     public abstract string GetCustomerUserId();
     public abstract void SetSessionTime(int time);
     public abstract void SetCacheEventSetting(bool setting);
+    public abstract void SetEncryptRequestsSetting(bool setting);
     public abstract string GetAnalyticsInstallationId();
     public abstract void SetGoogleDMAParameters(bool adPersonalization, bool adUserData);
 }

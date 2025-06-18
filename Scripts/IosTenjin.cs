@@ -125,6 +125,9 @@ public class IosTenjin : BaseTenjin
     private static extern void iosTenjinSetCacheEventSetting(bool setting);
 
     [DllImport ("__Internal")]
+    private static extern void iosTenjinSetEncryptRequestsSetting(bool setting);
+
+    [DllImport ("__Internal")]
     private static extern void iosTenjinSetGoogleDMAParameters(bool adPersonalization, bool adUserData);
 
     [DllImport ("__Internal")]
@@ -606,6 +609,14 @@ public class IosTenjin : BaseTenjin
         iosTenjinSetCacheEventSetting(setting);
     }
 
+    public override void SetEncryptRequestsSetting(bool setting)
+    {
+        if (Debug.isDebugBuild) {
+            Debug.Log ("Sending IosTenjin::SetEncryptRequestsSetting");
+        }
+        iosTenjinSetEncryptRequestsSetting(setting);
+    }
+
     public override string GetAnalyticsInstallationId()
     {
         if (Debug.isDebugBuild) {
@@ -990,6 +1001,11 @@ public class IosTenjin : BaseTenjin
         public override void SetCacheEventSetting(bool setting)
         {
                 Debug.Log("iOS SetCacheEventSetting");
+        }
+
+        public override void SetEncryptRequestsSetting(bool setting)
+        {
+                Debug.Log("iOS SetEncryptRequestsSetting");
         }
 
         public override void SetGoogleDMAParameters(bool adPersonalization, bool adUserData)
